@@ -27,7 +27,7 @@ public class Processor {
 
     void process() throws IOException {
         // write headers
-        //timerOut.write(timerKeywords.stream().collect(Collectors.joining(",")));
+        timerOut.write(timerKeywords.stream().collect(Collectors.joining(",")));
         timerOut.newLine();
         hibernateOut.write(Lists.newArrayList("time", "rows", "query").stream().collect(Collectors.joining(",")));
         hibernateOut.newLine();
