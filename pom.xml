@@ -27,7 +27,7 @@
     <parent>
         <groupId>io.spring.platform</groupId>
         <artifactId>platform-bom</artifactId>
-        <version>Brussels-SR1</version>
+        <version>Brussels-SR3</version>
         <relativePath/>
     </parent>
 
@@ -35,7 +35,7 @@
         <developer>
             <email>mark.wigmans@ximedes.com</email>
             <name>Mark Wigmans</name>
-            <url>https://github.com/markwigmans</url>
+            <url>https://github.com/markwigmans/loggraph</url>
             <id>mawi</id>
         </developer>
     </developers>
