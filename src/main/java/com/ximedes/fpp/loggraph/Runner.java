@@ -7,7 +7,8 @@ import net.sourceforge.argparse4j.inf.Namespace;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
-import java.io.*;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 
 /**
  * Created by mawi on 30/03/2017.

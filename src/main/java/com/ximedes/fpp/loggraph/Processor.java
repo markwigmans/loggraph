@@ -2,11 +2,14 @@ package com.ximedes.fpp.loggraph;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.*;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -40,19 +43,23 @@ public class Processor {
 
     private void processLine(final String line) {
         try {
-            final int i = line.indexOf("net.mcfpp.metrics");
-            if (i > 0) {
-                final String processed = processTimerMetrics(line.substring(i)).stream().collect(Collectors.joining(","));
+            if (line.indexOf("net.mcfpp.metrics") > 0) {
+                final String processed = processTimerMetrics(line).stream()
+                        .map(StringEscapeUtils::escapeCsv)
+                        .collect(Collectors.joining(","));
                 if (StringUtils.isNoneBlank(processed)) {
                     timerOut.write(processed);
                     timerOut.newLine();
                 }
-            }
-            if (line.indexOf("org.hibernate.stat.Statistics") > 0) {
-                final String processed = processHibernateMetrics(line).stream().collect(Collectors.joining(","));
-                if (StringUtils.isNoneBlank(processed)) {
-                    hibernateOut.write(processed);
-                    hibernateOut.newLine();
+            } else {
+                if (line.indexOf("org.hibernate.stat.Statistics") > 0) {
+                    final String processed = processHibernateMetrics(line).stream()
+                            .map(StringEscapeUtils::escapeCsv)
+                            .collect(Collectors.joining(","));
+                    if (StringUtils.isNoneBlank(processed)) {
+                        hibernateOut.write(processed);
+                        hibernateOut.newLine();
+                    }
                 }
             }
 
@@ -65,6 +72,8 @@ public class Processor {
     List<String> processTimerMetrics(final String line) {
         if (line.indexOf("type=TIMER") > 0) {
             final List<String> output = Lists.newArrayList();
+            output.add(findTimestamp(line));
+
             final Splitter splitter = Splitter.on(',').omitEmptyStrings().trimResults();
             for (String element : splitter.split(line)) {
                 final String[] split = element.split("=");
@@ -76,6 +85,15 @@ public class Processor {
         } else {
             return Collections.emptyList();
         }
+    }
+
+    String findTimestamp(final String line) {
+        final Pattern p = Pattern.compile(".*(\\d{2}:\\d{2}:\\d{2}[.,]\\d{3}).*");
+        Matcher m = p.matcher(line);
+        if (m.matches()) {
+            return m.group(1);
+        }
+        return "";
     }
 
 
@@ -93,7 +111,7 @@ public class Processor {
                 output.add(value);
             }
         }
-        output.add('"' + line.substring(line.indexOf("HQL:"), index) + '"');
+        output.add(line.substring(line.indexOf("HQL:"), index));
         return output;
     }
 }
