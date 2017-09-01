@@ -2,6 +2,7 @@ package com.ximedes.fpp.loggraph;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -15,6 +16,7 @@ import java.util.stream.Collectors;
 /**
  * Created by mawi on 30/03/2017.
  */
+@Slf4j
 public class Processor {
 
     final BufferedReader in;
@@ -88,10 +90,16 @@ public class Processor {
     }
 
     String findTimestamp(final String line) {
-        final Pattern p = Pattern.compile(".*(\\d{2}:\\d{2}:\\d{2}[.,]\\d{3}).*");
+        final Pattern p = Pattern.compile("\\S*(\\d{4}-\\d{2}-\\d{2}\\s{1})?(\\d{2}:\\d{2}:\\d{2}[.,]\\d{3}).*");
         Matcher m = p.matcher(line);
         if (m.matches()) {
-            return m.group(1);
+            log.debug("patterns: '{}' + '{}'", m.group(1),  m.group(2));
+            final String time = StringUtils.replace(StringUtils.normalizeSpace(m.group(2)), ",",".");
+            if (m.group(1) != null) {
+                return StringUtils.normalizeSpace(m.group(1)) + " " + time;
+            } else {
+                return time;
+            }
         }
         return "";
     }
